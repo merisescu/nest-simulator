@@ -109,7 +109,7 @@ operator<( long t, const HistEntryEprop& e )
 class HistEntryEpropRecurrent : public HistEntryEprop
 {
 public:
-  HistEntryEpropRecurrent( long t, double surrogate_gradient, double learning_signal, double firing_rate_reg );
+  HistEntryEpropRecurrent( long t, double surrogate_gradient, double learning_signal, double firing_rate_reg, double v_m );
 
   double surrogate_gradient_;
   double learning_signal_;

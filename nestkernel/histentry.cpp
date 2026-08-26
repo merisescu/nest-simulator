@@ -46,7 +46,7 @@ nest::HistEntryEpropRecurrent::HistEntryEpropRecurrent( long t,
   double surrogate_gradient,
   double learning_signal,
   double firing_rate_reg,
-  double v_m,)
+  double v_m)
   : HistEntryEprop( t )
   , surrogate_gradient_( surrogate_gradient )
   , learning_signal_( learning_signal )
