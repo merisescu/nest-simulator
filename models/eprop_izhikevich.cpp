@@ -88,8 +88,6 @@ eprop_izhikevich::State_::State_()
     : v_m_( -70.0 )        // membrane potential
     , u_m_( 0.2 * -70.0 )  // membrane recovery variable (b * V_m_init)
     , i_in_( 0.0 )          // input current
-    , epsilon_v_( 0.0 )     // voltage eligibility
-    , epsilon_u_( 0.0 )     // adaptation eligibility
     , learning_signal_( 0.0 )
     , surrogate_gradient_( 0.0 )
 {
@@ -297,7 +295,7 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
     append_new_eprop_history_entry( t );
     write_surrogate_gradient_to_history( t, S_.surrogate_gradient_ );
     write_firing_rate_reg_to_history( t, z, P_.f_target_, P_.kappa_reg_, P_.c_reg_ );
-    write_elgibility_voltage_to_history( t, S_.epsilon_v_);
+    write_voltage_to_history( t, S_.v_m_);
 
     S_.learning_signal_ = get_learning_signal_from_history( t );
 
@@ -397,11 +395,11 @@ eprop_izhikevich::compute_gradient( const long t_spike,
     const double psi = eprop_hist_it->surrogate_gradient_;  // surrogate gradient
     const double L = eprop_hist_it->learning_signal_;       // learning signal
     const double fr_reg = eprop_hist_it->firing_rate_reg_;  // firing rate regularization
-    const double e_v = eprop_hist_it->eligibility_voltage_; // component of eligibility vector for voltage
-    //const double e_u = eprop_hist_it->eligibility_adaptation_; // component of eligibility vector for adaptation
-    // TODO: add eligibility vectors as history items
 
-    const double e = psi * e_v;  // eligibility trace
+    const double v_m = get_voltage_from_history( t ); // membrane voltage of presynaptic neuron
+    // atp just add v_m to the eprop history cause its too much work otherwise
+
+    const double e = psi;  // eligibility trace
     e_bar = P_.kappa_ * e_bar + e;
     e_bar_reg = P_.kappa_reg_ * e_bar_reg + ( 1.0 - P_.kappa_reg_ ) * e;
 

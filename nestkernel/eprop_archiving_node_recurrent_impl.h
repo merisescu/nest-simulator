@@ -246,6 +246,21 @@ EpropArchivingNodeRecurrent< hist_shift_required >::write_firing_rate_reg_to_his
 }
 
 template < bool hist_shift_required >
+void
+EpropArchivingNodeRecurrent< hist_shift_required >::write_voltage_to_history( const long time_step,
+  const double v_m )
+{
+  if ( eprop_indegree_ == 0 )
+  {
+    return;
+  }
+
+  const long shift = Time::get_resolution().get_steps();
+
+  firing_rate_reg_history_.emplace_back( time_step + shift, v_m);
+}
+
+template < bool hist_shift_required >
 double
 EpropArchivingNodeRecurrent< hist_shift_required >::get_firing_rate_reg_history( const long time_step )
 {
@@ -276,6 +291,17 @@ EpropArchivingNodeRecurrent< hist_shift_required >::get_learning_signal_from_his
 }
 
 template < bool hist_shift_required >
+double
+EpropArchivingNodeRecurrent< hist_shift_required >::get_voltage_from_history( const long time_step )
+{
+  const auto it_hist = std::lower_bound( v_m_history_.begin(), v_m_history_.end(), time_step );
+  assert( it_hist != v_m_history_.end() );
+
+  return it_hist->v_m_;
+  return ;
+}
+
+template < bool hist_shift_required >
 void
 EpropArchivingNodeRecurrent< hist_shift_required >::erase_used_firing_rate_reg_history()
 {
@@ -287,6 +313,27 @@ EpropArchivingNodeRecurrent< hist_shift_required >::erase_used_firing_rate_reg_h
     if ( it_update_hist->access_counter_ == 0 )
     {
       it_reg_hist = firing_rate_reg_history_.erase( it_reg_hist );
+    }
+    else
+    {
+      ++it_reg_hist;
+    }
+    ++it_update_hist;
+  }
+}
+
+template < bool hist_shift_required >
+void
+EpropArchivingNodeRecurrent< hist_shift_required >::erase_used_v_m_history()
+{
+  auto it_update_hist = update_history_.begin();
+  auto it_reg_hist = v_m_history_.begin();
+
+  while ( it_update_hist != update_history_.end() and it_reg_hist != v_m_history_.end() )
+  {
+    if ( it_update_hist->access_counter_ == 0 )
+    {
+      it_reg_hist = v_m_history_.erase( it_reg_hist );
     }
     else
     {

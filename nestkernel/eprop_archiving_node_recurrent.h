@@ -201,6 +201,15 @@ public:
     const double c_reg );
 
   /**
+   * Writes the membrane voltage to history for eligibility traces requiring dynamic v_m
+   *
+   * @param time_step The time step.
+   * @param v_m The membrane voltage of the neuron.
+   */
+  void write_voltage_to_history( const long time_step,
+    const double v_m);
+
+  /**
    * Retrieves the firing rate regularization at the specified time step from the firing rate regularization history.
    *
    * @param time_step The time step.
@@ -219,12 +228,29 @@ public:
   double get_learning_signal_from_history( const long time_step );
 
   /**
+   * Retrieves the membrane voltage from the specified time step
+   *
+   * @param time_step The time step.
+   *
+   * @return The membrane voltage at the specified time step
+   */
+  double get_voltage_from_history( const long time_step );
+
+  /**
    * @brief Erases the history of the used firing rate regularization history.
    *
    * Erases parts of the firing rate regularization history for which the access counter in the update history has
    * decreased to zero since no synapse needs them any longer.
    */
   void erase_used_firing_rate_reg_history();
+
+  /**
+   * @brief Erases the history of the used membrane voltage history.
+   *
+   * Erases parts of the firing rate regularization history for which the access counter in the update history has
+   * decreased to zero since no synapse needs them any longer.
+   */
+  void erase_used_v_m_history();
 
   /**
    * Counts an emitted spike for the firing rate regularization.
@@ -258,6 +284,8 @@ private:
 
   //! History of the firing rate regularization.
   std::vector< HistEntryEpropFiringRateReg > firing_rate_reg_history_;
+
+  std::vector< HistEntryEpropNonlinear > v_m_history_;
 
   /**
    * Maps provided names of surrogate gradients to corresponding pointers to member functions.

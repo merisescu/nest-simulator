@@ -70,3 +70,10 @@ nest::HistEntryEpropFiringRateReg::HistEntryEpropFiringRateReg( long t, double f
   , firing_rate_reg_( firing_rate_reg )
 {
 }
+
+nest::HistEntryEpropNonlinear::HistEntryEpropNonlinear( long t,
+  double v_m )
+  : HistEntryEprop( t )
+  , v_m_( v_m )
+{
+}

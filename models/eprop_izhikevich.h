@@ -162,9 +162,6 @@ private:
         double u_m_;
         double i_in_;
 
-        double epsilon_v_;
-        double epsilon_u_;
-
         double learning_signal_;
         double surrogate_gradient_;
 
