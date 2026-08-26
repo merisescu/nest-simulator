@@ -162,7 +162,6 @@ private:
         double v_m_;
         double u_m_;
         double i_in_;
-        double z_in_;
 
         double learning_signal_;
         double surrogate_gradient_;
@@ -185,8 +184,7 @@ private:
       //! Copy constructor.
       Buffers_( const Buffers_&, eprop_izhikevich& );
 
-      RingBuffer spike_count_; // unweighted
-      RingBuffer spikes_; // weighted
+      RingBuffer spikes_;
       RingBuffer currents_;
       UniversalDataLogger< eprop_izhikevich > logger_;
     };
@@ -198,9 +196,6 @@ private:
 
         //! Propagator matrix entry for evolving the epsilon_ dependent of the adaptation eligibility vector
         double P_epsilon_;
-
-        //! Propagator matrix entry for evolving the incoming currents.
-        //double P_i_in_;
     };
     //! Get the current value of the membrane voltage.
     double get_v_m_() const

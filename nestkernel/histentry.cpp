@@ -45,11 +45,13 @@ nest::HistEntryEprop::HistEntryEprop( long t )
 nest::HistEntryEpropRecurrent::HistEntryEpropRecurrent( long t,
   double surrogate_gradient,
   double learning_signal,
-  double firing_rate_reg )
+  double firing_rate_reg,
+  double v_m,)
   : HistEntryEprop( t )
   , surrogate_gradient_( surrogate_gradient )
   , learning_signal_( learning_signal )
   , firing_rate_reg_( firing_rate_reg )
+  , v_m_( v_m )
 {
 }
 
@@ -68,12 +70,5 @@ nest::HistEntryEpropUpdate::HistEntryEpropUpdate( long t, size_t access_counter 
 nest::HistEntryEpropFiringRateReg::HistEntryEpropFiringRateReg( long t, double firing_rate_reg )
   : HistEntryEprop( t )
   , firing_rate_reg_( firing_rate_reg )
-{
-}
-
-nest::HistEntryEpropNonlinear::HistEntryEpropNonlinear( long t,
-  double v_m )
-  : HistEntryEprop( t )
-  , v_m_( v_m )
 {
 }

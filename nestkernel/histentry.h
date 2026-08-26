@@ -114,18 +114,6 @@ public:
   double surrogate_gradient_;
   double learning_signal_;
   double firing_rate_reg_;
-};
-
-/**
- * Class implementing entries of the recurrent node model's history of e-prop dynamic variables.
- * 
- * For models with e-prop variables dependent on other dynamic variables.
- */
-class HistEntryEpropNonlinear : public HistEntryEprop
-{
-public:
-  HistEntryEpropNonlinear( long t, double v_m );
-
   double v_m_;
 };
 

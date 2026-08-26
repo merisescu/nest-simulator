@@ -245,14 +245,6 @@ public:
   void erase_used_firing_rate_reg_history();
 
   /**
-   * @brief Erases the history of the used membrane voltage history.
-   *
-   * Erases parts of the firing rate regularization history for which the access counter in the update history has
-   * decreased to zero since no synapse needs them any longer.
-   */
-  void erase_used_v_m_history();
-
-  /**
    * Counts an emitted spike for the firing rate regularization.
    */
   void count_spike();

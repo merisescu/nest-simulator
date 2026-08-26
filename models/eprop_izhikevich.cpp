@@ -88,7 +88,6 @@ eprop_izhikevich::State_::State_()
     : v_m_( -70.0 )        // membrane potential
     , u_m_( 0.2 * -70.0 )  // membrane recovery variable (b * V_m_init)
     , i_in_( 0.0 )          // input current
-    , z_in_( 0 )          // n. input spikes (for eligibility trace calculation)
     , learning_signal_( 0.0 )
     , surrogate_gradient_( 0.0 )
 {
@@ -266,7 +265,6 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
   for ( long lag = from; lag < to; ++lag )
   {
     const long t = origin.get_steps() + lag;
-    S_.z_in_ = B_.spike_count_.get_value( lag );
     S_.i_in_ = B_.spikes_.get_value( lag );
     v_old = S_.v_m_;
     u_old = S_.u_m_;
@@ -303,7 +301,6 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
     write_surrogate_gradient_to_history( t, S_.surrogate_gradient_ );
     write_firing_rate_reg_to_history( t, z, P_.f_target_, P_.kappa_reg_, P_.c_reg_ );
     write_voltage_to_history( t, S_.v_m_);
-    write_spike_count_to_history( t, S_.z_in_ );
 
     S_.learning_signal_ = get_learning_signal_from_history( t );
 
@@ -321,8 +318,6 @@ void
 eprop_izhikevich::handle( SpikeEvent& e )
 {
   assert( e.get_delay_steps() > 0 );
-
-  B_.spike_count_.add_value( e.get_rel_delivery_steps( kernel().simulation_manager.get_slice_origin() ), e.get_multiplicity());
 
   B_.spikes_.add_value(
     e.get_rel_delivery_steps( kernel().simulation_manager.get_slice_origin() ), e.get_weight() * e.get_multiplicity() );
@@ -407,27 +402,19 @@ eprop_izhikevich::compute_gradient( const long t_spike,
     const double L = eprop_hist_it->learning_signal_;       // learning signal
     const double fr_reg = eprop_hist_it->firing_rate_reg_;  // firing rate regularization
     const double v_m = eprop_hist_it->v_m_; //membrane voltage
-    const double z_in = eprop_hist_it->z_in_; // number of input spikes received per time step
 
     const double epsilon_v_old = epsilon_v; // temporary assignment to keep correct relations
     //const double epsilon_old = epsilon;
-    const double z_nt = 1 - z;
-
-    // TODO: maybe figure out how to remove z from this to cut down on the computation waste
-    // bc for all except i think the second step (if previous was spike not flush event), then z = 0
-    // i dont know what happens on t_end actually
-    // maybe if condition it could be cheaper when compiled using t == t_spike_previous
-    /*if ( t == t_spike_previous ) {
-      epsilon_v = dt * ( S_.i_in_ - epsilon )
-      epsilon = V_.P_epsilon_ * epsilon
+    if ( v_m == P_.c_ ) 
+    {
+      epsilon_v = dt * ( z - epsilon );
+      epsilon =  V_.P_epsilon_ * epsilon;
     }
-    else {
-      epsilon_v = (1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * ( epsilon + S_.i_in_);
-      epsilon_ = ( V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon);
+    else 
+    {
+      epsilon_v = ( 1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v + dt * ( z - epsilon );
+      epsilon =  V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon;
     }
-    */
-    epsilon_v = z_nt * (1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * ( epsilon + z_in);
-    epsilon = z_nt * ( V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon);
 
     const double e = psi * epsilon_v;  // eligibility trace
 
@@ -449,14 +436,32 @@ eprop_izhikevich::compute_gradient( const long t_spike,
 
   remaining_steps_until_cutoff -= t_steps;
   const long remaining_steps_until_event = isi_steps - t_steps;
-
   decay_steps += remaining_steps_until_event;
 
   if ( not is_flush_event and decay_steps > 0 )
   {
     e_bar *= std::pow( P_.kappa_, decay_steps );
     e_bar_reg *= std::pow( P_.kappa_reg_, decay_steps );
-    decay_steps = 0;
+    // knowledge of v_m still required for the decay of eligibility vector (for now, pretty unoptimized)
+    for ( long t = t_end; decay_steps > 0; ++t, ++eprop_hist_it ) 
+    {
+      require_eprop_history_entry( eprop_hist_it, t );
+
+      const double v_m = eprop_hist_it->v_m_; //membrane voltage
+      const double epsilon_v_old = epsilon_v;
+
+      if ( v_m == P_.c_ ) 
+      {
+        epsilon_v = - dt * epsilon;
+        epsilon =  V_.P_epsilon_ * epsilon;
+      }
+      else 
+      {
+        epsilon_v = ( 1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * epsilon;
+        epsilon =  V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon;
+      }
+      --decay_steps;
+    }
   }
 
   if ( not is_flush_event and not optimize_each_step )

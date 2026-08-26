@@ -322,25 +322,4 @@ EpropArchivingNodeRecurrent< hist_shift_required >::erase_used_firing_rate_reg_h
   }
 }
 
-template < bool hist_shift_required >
-void
-EpropArchivingNodeRecurrent< hist_shift_required >::erase_used_v_m_history()
-{
-  auto it_update_hist = update_history_.begin();
-  auto it_reg_hist = v_m_history_.begin();
-
-  while ( it_update_hist != update_history_.end() and it_reg_hist != v_m_history_.end() )
-  {
-    if ( it_update_hist->access_counter_ == 0 )
-    {
-      it_reg_hist = v_m_history_.erase( it_reg_hist );
-    }
-    else
-    {
-      ++it_reg_hist;
-    }
-    ++it_update_hist;
-  }
-}
-
 }  // namespace nest
