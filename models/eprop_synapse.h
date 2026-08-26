@@ -333,6 +333,9 @@ private:
   //! Adaptive threshold component of the eligibility vector.
   double epsilon_ = 0.0;
 
+  //! Membrane voltage component of the eligibility vector.
+  double epsilon_v_ = 0.0;
+
   //! Value of spiking variable one time step before t_previous_spike_.
   double z_previous_buffer_ = 0.0;
 
@@ -415,6 +418,7 @@ eprop_synapse< targetidentifierT >::operator=( const eprop_synapse& es )
   e_bar_ = es.e_bar_;
   e_bar_reg_ = es.e_bar_reg_;
   epsilon_ = es.epsilon_;
+  epsilon_v_ = es.epsilon_v_;
   z_previous_buffer_ = es.z_previous_buffer_;
   gradient_ = es.gradient_;
   remaining_steps_until_cutoff_ = es.remaining_steps_until_cutoff_;
@@ -435,6 +439,7 @@ eprop_synapse< targetidentifierT >::eprop_synapse( eprop_synapse&& es )
   , e_bar_( es.e_bar_ )
   , e_bar_reg_( es.e_bar_reg_ )
   , epsilon_( es.epsilon_ )
+  , epsilon_v( es.epsilon_v_ )
   , z_previous_buffer_( es.z_previous_buffer_ )
   , gradient_( es.gradient_ )
   , remaining_steps_until_cutoff_( es.remaining_steps_until_cutoff_ )
@@ -465,6 +470,7 @@ eprop_synapse< targetidentifierT >::operator=( eprop_synapse&& es )
   e_bar_ = es.e_bar_;
   e_bar_reg_ = es.e_bar_reg_;
   epsilon_ = es.epsilon_;
+  epsilon_v = es.epsilon_v;
   z_previous_buffer_ = es.z_previous_buffer_;
   gradient_ = es.gradient_;
   remaining_steps_until_cutoff_ = es.remaining_steps_until_cutoff_;
@@ -525,6 +531,7 @@ eprop_synapse< targetidentifierT >::send( Event& e, size_t thread, const EpropSy
       e_bar_,
       e_bar_reg_,
       epsilon_,
+      epsilon_v,
       weight_,
       cp,
       optimizer_,

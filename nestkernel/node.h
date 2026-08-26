@@ -838,6 +838,7 @@ public:
   virtual double get_tau_syn_ex( int comp );
   virtual double get_tau_syn_in( int comp );
 
+
   /**
    * Compute gradient change for eprop synapses.
    *
@@ -852,6 +853,7 @@ public:
    * @param e_bar [in, out] Filtered eligibility trace.
    * @param e_bar_reg [in, out] Filtered eligibility trace for firing rate regularization.
    * @param epsilon [out] Component of eligibility vector corresponding to the adaptive firing threshold variable.
+   * @param epsilon_v [out] Component of eligibility vector corresponding to the membrane voltage variable.
    * @param weight [in, out] Synaptic weight.
    * @param cp [in] Common properties for synapses.
    * @param optimizer [in] Instance of weight optimizer.
@@ -864,6 +866,7 @@ public:
     double& e_bar,
     double& e_bar_reg,
     double& epsilon,
+    double& epsilon_v,
     double& weight,
     const CommonSynapseProperties& cp,
     WeightOptimizer* optimizer,

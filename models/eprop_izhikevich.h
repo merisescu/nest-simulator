@@ -94,6 +94,7 @@ private:
     double&,
     double&,
     double&,
+    double&,
     const CommonSynapseProperties&,
     WeightOptimizer*,
     const bool,
@@ -194,11 +195,11 @@ private:
 
     struct Variables_
     {
-        //! Propagator matrix entry for evolving the membrane voltage (mathematical symbol "alpha" in user documentation).
-        //double P_v_m_;
+        //! Propagator matrix entry for evolving the epsilon_v_ dependent part of the adaptation eligibility vector
+        double P_epsilon_v_;
 
-        //! Propagator matrix entry for evolving the adaptive current
-        //double P_u_m_;
+        //! Propagator matrix entry for evolving the epsilon_ dependent of the adaptation eligibility vector
+        double P_epsilon_;
 
         //! Propagator matrix entry for evolving the incoming currents.
         //double P_i_in_;

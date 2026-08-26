@@ -242,9 +242,15 @@ eprop_izhikevich::pre_run_hook()
 
   FlushEventMechanism::pre_run_hook();
 
+  const double dt = Time::get_resolution().get_ms();
+
   // calculate the entries of the propagator matrix for the evolution of the state vector
 
-  const double dt = Time::get_resolution().get_ms();
+  V_.P_epsilon_v_ = dt * P_.a_ * P_.b_;
+  V_.P_epsilon_ = 1 - dt * P_.a_;
+  //V_.P_epsilon_v_t_ = dt * 0.08;
+  //V_.P_epsilon_5_ = dt * 5;
+
 }
 
 /* ----------------------------------------------------------------
@@ -351,10 +357,11 @@ void
 eprop_izhikevich::compute_gradient( const long t_spike,
   const long t_spike_previous,
   double& z_previous_buffer,
-  double& z_bar,
+  double& /*z_bar*/,
   double& e_bar,
   double& e_bar_reg,
   double& epsilon,
+  double& epsilon_v,
   double& weight,
   const CommonSynapseProperties& cp,
   WeightOptimizer* optimizer,
@@ -395,11 +402,31 @@ eprop_izhikevich::compute_gradient( const long t_spike,
     const double psi = eprop_hist_it->surrogate_gradient_;  // surrogate gradient
     const double L = eprop_hist_it->learning_signal_;       // learning signal
     const double fr_reg = eprop_hist_it->firing_rate_reg_;  // firing rate regularization
+    const double v_m = eprop_hist_it->v_m_; //membrane voltage
+    const double z_in = eprop_hist_it->z_in_; // number of input spikes received per time step
 
-    const double v_m = get_voltage_from_history( t ); // membrane voltage of presynaptic neuron
-    // atp just add v_m to the eprop history cause its too much work otherwise
+    const double epsilon_v_old = epsilon_v; // temporary assignment to keep correct relations
+    //const double epsilon_old = epsilon;
+    const double z_nt = 1 - z;
 
-    const double e = psi;  // eligibility trace
+    // TODO: maybe figure out how to remove z from this to cut down on the computation waste
+    // bc for all except i think the second step (if previous was spike not flush event), then z = 0
+    // i dont know what happens on t_end actually
+    // maybe if condition it could be cheaper when compiled using t == t_spike_previous
+    /*if ( t == t_spike_previous ) {
+      epsilon_v = (1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * ( epsilon + S_.i_in_);
+      epsilon_ = ( V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon);
+    }
+    else {
+      epsilon_v = dt * ( S_.i_in_ - epsilon )
+      epsilon = V_.P_epsilon_ * epsilon
+    }
+    */
+    epsilon_v = z_nt * (1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * ( epsilon + z_in);
+    epsilon = z_nt * ( V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon);
+
+    const double e = psi * epsilon_v;  // eligibility trace
+
     e_bar = P_.kappa_ * e_bar + e;
     e_bar_reg = P_.kappa_reg_ * e_bar_reg + ( 1.0 - P_.kappa_reg_ ) * e;
 
@@ -423,7 +450,8 @@ eprop_izhikevich::compute_gradient( const long t_spike,
 
   if ( not is_flush_event and decay_steps > 0 )
   {
-    //z_bar *= std::pow( V_.P_v_m_, decay_steps );
+    // how does one propagate based on v_m and z_in
+    // probably need to push calculation of epsilon and epsilon_v to update...
     e_bar *= std::pow( P_.kappa_, decay_steps );
     e_bar_reg *= std::pow( P_.kappa_reg_, decay_steps );
     decay_steps = 0;
