@@ -162,6 +162,7 @@ private:
         double v_m_;
         double u_m_;
         double i_in_;
+        double z_in_;
 
         double learning_signal_;
         double surrogate_gradient_;
@@ -184,13 +185,10 @@ private:
       //! Copy constructor.
       Buffers_( const Buffers_&, eprop_izhikevich& );
 
-      RingBuffer spikes_;
+      RingBuffer spike_count_; // unweighted
+      RingBuffer spikes_; // weighted
       RingBuffer currents_;
       UniversalDataLogger< eprop_izhikevich > logger_;
-
-      /** buffers and sums up incoming spikes/currents */
-      RingBuffer spikes_;
-      RingBuffer currents_;
     };
 
     struct Variables_

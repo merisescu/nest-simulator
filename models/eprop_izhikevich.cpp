@@ -88,6 +88,7 @@ eprop_izhikevich::State_::State_()
     : v_m_( -70.0 )        // membrane potential
     , u_m_( 0.2 * -70.0 )  // membrane recovery variable (b * V_m_init)
     , i_in_( 0.0 )          // input current
+    , z_in_( 0 )          // n. input spikes (for eligibility trace calculation)
     , learning_signal_( 0.0 )
     , surrogate_gradient_( 0.0 )
 {
@@ -265,7 +266,7 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
   for ( long lag = from; lag < to; ++lag )
   {
     const long t = origin.get_steps() + lag;
-
+    S_.z_in_ = B_.spike_count_.get_value( lag );
     S_.i_in_ = B_.spikes_.get_value( lag );
     v_old = S_.v_m_;
     u_old = S_.u_m_;
@@ -302,6 +303,7 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
     write_surrogate_gradient_to_history( t, S_.surrogate_gradient_ );
     write_firing_rate_reg_to_history( t, z, P_.f_target_, P_.kappa_reg_, P_.c_reg_ );
     write_voltage_to_history( t, S_.v_m_);
+    write_spike_count_to_history( t, S_.z_in_ );
 
     S_.learning_signal_ = get_learning_signal_from_history( t );
 
@@ -319,6 +321,8 @@ void
 eprop_izhikevich::handle( SpikeEvent& e )
 {
   assert( e.get_delay_steps() > 0 );
+
+  B_.spike_count_.add_value( e.get_rel_delivery_steps( kernel().simulation_manager.get_slice_origin() ), e.get_multiplicity());
 
   B_.spikes_.add_value(
     e.get_rel_delivery_steps( kernel().simulation_manager.get_slice_origin() ), e.get_weight() * e.get_multiplicity() );
