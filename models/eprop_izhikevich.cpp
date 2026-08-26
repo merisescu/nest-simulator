@@ -418,12 +418,12 @@ eprop_izhikevich::compute_gradient( const long t_spike,
     // i dont know what happens on t_end actually
     // maybe if condition it could be cheaper when compiled using t == t_spike_previous
     /*if ( t == t_spike_previous ) {
-      epsilon_v = (1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * ( epsilon + S_.i_in_);
-      epsilon_ = ( V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon);
-    }
-    else {
       epsilon_v = dt * ( S_.i_in_ - epsilon )
       epsilon = V_.P_epsilon_ * epsilon
+    }
+    else {
+      epsilon_v = (1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * ( epsilon + S_.i_in_);
+      epsilon_ = ( V_.P_epsilon_v_ * epsilon_v_old + V_.P_epsilon_ * epsilon);
     }
     */
     epsilon_v = z_nt * (1 + dt * ( 0.08 * v_m + 5 ) ) * epsilon_v - dt * ( epsilon + z_in);
@@ -454,8 +454,6 @@ eprop_izhikevich::compute_gradient( const long t_spike,
 
   if ( not is_flush_event and decay_steps > 0 )
   {
-    // how does one propagate based on v_m and z_in
-    // probably need to push calculation of epsilon and epsilon_v to update...
     e_bar *= std::pow( P_.kappa_, decay_steps );
     e_bar_reg *= std::pow( P_.kappa_reg_, decay_steps );
     decay_steps = 0;
