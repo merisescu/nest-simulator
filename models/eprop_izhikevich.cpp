@@ -270,7 +270,7 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
 
 
     S_.v_m_ += dt * ( 0.04*v_old*v_old + 5*v_old + 140 - u_old + S_.i_in_ + P_.I_e_) + B_.spikes_.get_value( lag );
-    S_.v_m_ = std::max( S_.v_m_, P_.V_min_ );
+    S_.v_m_ = ( S_.v_m_ < P_.V_min_ ? P_.V_min_ : S_.v_m_ );
 
     S_.u_m_ += dt * ( P_.a_ * ( P_.b_ * v_old - u_old ) );
 
@@ -303,7 +303,7 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
 
     S_.learning_signal_ = get_learning_signal_from_history( t );
 
-    S_.i_in_ = B_.currents_.get_value( lag ) + P_.I_e_;
+    S_.i_in_ = B_.currents_.get_value( lag );
 
     B_.logger_.record_data( t );
   }
