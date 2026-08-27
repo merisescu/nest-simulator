@@ -277,8 +277,6 @@ private:
   //! History of the firing rate regularization.
   std::vector< HistEntryEpropFiringRateReg > firing_rate_reg_history_;
 
-  std::vector< HistEntryEpropNonlinear > v_m_history_;
-
   /**
    * Maps provided names of surrogate gradients to corresponding pointers to member functions.
    *

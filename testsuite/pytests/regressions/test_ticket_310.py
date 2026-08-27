@@ -32,6 +32,7 @@ skip_list = [
     "eprop_iaf_adapt",  # no ArchivingNode, thus no t_spike
     "eprop_iaf_psc_delta",  # no ArchivingNode, thus no t_spike
     "eprop_iaf_psc_delta_adapt",  # no ArchivingNode, thus no t_spike
+    "eprop_izhikevich",  # no ArchivingNode, thus no t_spike
     "eprop_readout",  # no ArchivingNode, thus no t_spike
     "iaf_chxk_2008",  # non-standard spiking conditions
     "izhikevich",  # generating output spike not reliably suppressed even for subthreshold V_m

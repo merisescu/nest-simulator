@@ -22,6 +22,7 @@ eprop_iaf
 eprop_iaf_adapt
 eprop_iaf_psc_delta
 eprop_iaf_psc_delta_adapt
+eprop_izhikevich
 eprop_readout
 eprop_synapse
 eprop_learning_signal_connection

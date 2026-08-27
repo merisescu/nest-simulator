@@ -155,7 +155,7 @@ EpropArchivingNodeRecurrent< hist_shift_required >::append_new_eprop_history_ent
     return;
   }
 
-  eprop_history_.emplace_back( time_step, 0.0, 0.0, 0.0 );
+  eprop_history_.emplace_back( time_step, 0.0, 0.0, 0.0, 0.0 );
 }
 
 template < bool hist_shift_required >
@@ -255,9 +255,8 @@ EpropArchivingNodeRecurrent< hist_shift_required >::write_voltage_to_history( co
     return;
   }
 
-  const long shift = Time::get_resolution().get_steps();
-
-  firing_rate_reg_history_.emplace_back( time_step + shift, v_m);
+  auto it_hist = get_eprop_history( time_step );
+  it_hist->v_m_ = v_m;
 }
 
 template < bool hist_shift_required >
@@ -289,18 +288,14 @@ EpropArchivingNodeRecurrent< hist_shift_required >::get_learning_signal_from_his
 
   return it->learning_signal_;
 }
-
+/*
 template < bool hist_shift_required >
 double
 EpropArchivingNodeRecurrent< hist_shift_required >::get_voltage_from_history( const long time_step )
 {
-  const auto it_hist = std::lower_bound( v_m_history_.begin(), v_m_history_.end(), time_step );
-  assert( it_hist != v_m_history_.end() );
-
-  return it_hist->v_m_;
-  return ;
+  
 }
-
+*/
 template < bool hist_shift_required >
 void
 EpropArchivingNodeRecurrent< hist_shift_required >::erase_used_firing_rate_reg_history()

@@ -357,6 +357,7 @@ private:
     double&,
     double&,
     double&,
+    double&,
     const CommonSynapseProperties&,
     WeightOptimizer*,
     const bool,
