@@ -265,12 +265,11 @@ eprop_izhikevich::update( Time const& origin, const long from, const long to )
   for ( long lag = from; lag < to; ++lag )
   {
     const long t = origin.get_steps() + lag;
-    S_.i_in_ = B_.spikes_.get_value( lag );
     v_old = S_.v_m_;
     u_old = S_.u_m_;
 
 
-    S_.v_m_ += dt * ( 0.04*v_old*v_old + 5*v_old + 140 - u_old + S_.i_in_);
+    S_.v_m_ += dt * ( 0.04*v_old*v_old + 5*v_old + 140 - u_old + S_.i_in_ + P_.I_e_) + B_.spikes_.get_value( lag );
     S_.v_m_ = std::max( S_.v_m_, P_.V_min_ );
 
     S_.u_m_ += dt * ( P_.a_ * ( P_.b_ * v_old - u_old ) );
