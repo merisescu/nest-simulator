@@ -162,6 +162,10 @@ public:
   virtual void
   send_weight_event( const size_t tid, const unsigned int lcid, Event& e, const CommonSynapseProperties& cp ) = 0;
 
+  virtual void
+  send_synapse_recording_event( const size_t tid, const unsigned int lcid, Event& e, const CommonSynapseProperties& cp ) = 0;
+
+
   /**
    * Update weights of dopamine modulated STDP connections.
    */
@@ -421,6 +425,7 @@ public:
         if ( event_sent )
         {
           send_weight_event( tid, lcid + lcid_offset, e, cp );
+          send_synapse_recording_event( tid, lcid + lcid_offset, e, cp );
         }
       }
       if ( not conn.source_has_more_targets() )
@@ -436,6 +441,10 @@ public:
   // Implemented in connector_base_impl.h
   void
   send_weight_event( const size_t tid, const unsigned int lcid, Event& e, const CommonSynapseProperties& cp ) override;
+
+  void
+  send_synapse_recorder_event( const size_t tid, const unsigned int lcid, Event& e, const CommonSynapseProperties& cp ) override;
+
 
   void
   trigger_update_weight( const long vt_node_id,

@@ -396,6 +396,7 @@ public:
    */
   virtual size_t handles_test_event( SpikeEvent&, size_t receptor_type );
   virtual size_t handles_test_event( WeightRecorderEvent&, size_t receptor_type );
+  virtual size_t handles_test_event( SynapseRecorderEvent&, size_t receptor_type );
   virtual size_t handles_test_event( RateEvent&, size_t receptor_type );
   virtual size_t handles_test_event( DataLoggingRequest&, size_t receptor_type );
   virtual size_t handles_test_event( CurrentEvent&, size_t receptor_type );
@@ -583,6 +584,20 @@ public:
    * @ingroup event_interface
    */
   virtual void handle( WeightRecorderEvent& e );
+
+  /**
+   * Handle incoming weight recording events.
+   *
+   * @param thrd Id of the calling thread.
+   * @param e Event object.
+   *
+   * This handler has to be implemented if a Node should
+   * accept weight recording events.
+   * @see class SynapseRecordingEvent
+   * @ingroup event_interface
+   */
+  virtual void handle( SynapseRecorderEvent& e );
+
 
   /**
    * Handler for rate events.

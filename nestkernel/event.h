@@ -86,6 +86,7 @@ class Node;
  * @see DSCurrentEvent
  * @see ConductanceEvent
  * @see WeightRecorderEvent
+ * @see SynapseRecorderEvent
  * @see DataLoggingRequest
  * @see DataLoggingReply
  * @see DataEvent
@@ -500,6 +501,53 @@ WeightRecorderEvent::get_receiver_node_id() const
   return receiver_node_id_;
 }
 
+/**
+ * Event for recording synapse information
+ */
+class SynapseRecorderEvent : public Event
+{
+public:
+  SynapseRecorderEvent();
+  SynapseRecorderEvent* clone() const override;
+  void operator()() override;
+
+  /**
+   * Return node ID of receiving Node.
+   */
+  size_t get_receiver_node_id() const;
+
+  /**
+   * Change node ID of receiving Node.
+   */
+
+  void set_receiver_node_id( size_t );
+
+protected:
+  size_t receiver_node_id_;  //!< node ID of receiver or 0.
+};
+
+inline SynapseRecorderEvent::SynapseRecorderEvent()
+  : receiver_node_id_( 0 )
+{
+}
+
+inline SynapseRecorderEvent*
+SynapseRecorderEvent::clone() const
+{
+  return new SynapseRecorderEvent( *this );
+}
+
+inline void
+SynapseRecorderEvent::set_receiver_node_id( size_t node_id )
+{
+  receiver_node_id_ = node_id;
+}
+
+inline size_t
+SynapseRecorderEvent::get_receiver_node_id() const
+{
+  return receiver_node_id_;
+}
 
 /**
  * "Callback request event" for use in Device.

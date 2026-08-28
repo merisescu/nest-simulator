@@ -170,7 +170,8 @@ public:
     MULTIMETER,
     SPIKE_RECORDER,
     SPIN_DETECTOR,
-    WEIGHT_RECORDER
+    WEIGHT_RECORDER,
+    SYNAPSE_RECORDER
   };
 
   virtual Type get_type() const = 0;

@@ -80,6 +80,12 @@ WeightRecorderEvent::operator()()
 }
 
 void
+SynapseRecorderEvent::operator()()
+{
+  receiver_->handle( *this );
+}
+
+void
 DSSpikeEvent::operator()()
 {
   sender_->event_hook( *this );

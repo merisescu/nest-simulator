@@ -288,6 +288,18 @@ Node::handles_test_event( WeightRecorderEvent&, size_t )
 }
 
 void
+Node::handle( SynapseRecorderEvent& )
+{
+  throw UnexpectedEvent( "The target node does not handle synapse recorder events." );
+}
+
+size_t
+Node::handles_test_event( SynapseRecorderEvent&, size_t )
+{
+  throw IllegalConnection( "The target node or synapse model does not support synapse recorder events." );
+}
+
+void
 Node::handle( RateEvent& )
 {
   throw UnexpectedEvent( "The target node does not handle rate input." );

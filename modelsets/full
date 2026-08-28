@@ -125,6 +125,7 @@ stdp_synapse_hom
 stdp_triplet_synapse
 step_current_generator
 step_rate_generator
+synapse_recorder
 tanh_rate
 threshold_lin_rate
 tsodyks2_synapse
